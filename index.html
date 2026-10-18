@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OLED Animation Maker | Prepared by Nishanth, ECE Student</title>
+<!-- Prepared by Nishanth, ECE Student -->
+<style>
+:root{--blue:#1677ff;--blue2:#eaf3ff;--ink:#172642;--muted:#617493;--line:#dce7f7;--panel:#fff;--bg:#f7faff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:9px 12px;transition:.15s}button:hover{border-color:#8bbcff;background:#f5f9ff}button.primary{background:var(--blue);border-color:var(--blue);color:white}button.active{background:var(--blue);color:white;border-color:var(--blue)}button:disabled{opacity:.45;cursor:not-allowed}
+.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:20px;position:sticky;top:0;z-index:3}
+.brand{display:flex;align-items:center;gap:12px;min-width:245px}.logo{height:44px;width:44px;background:#07111f;border:3px solid #178cff;border-radius:11px;display:grid;place-items:center;color:#4cc9ff;font-size:24px}.brand h1{font-size:21px;margin:0;letter-spacing:-.5px}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}.topnav{display:flex;gap:8px}.topnav button{border:0;background:transparent;padding:12px 14px}.topnav button.active{background:#edf5ff;color:var(--blue)}
+.app{display:grid;grid-template-columns:255px minmax(380px,1fr) 300px;gap:14px;padding:16px;max-width:1800px;margin:auto}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}.left,.right{display:flex;flex-direction:column;gap:12px}.toolnav{display:grid;gap:6px}.navitem{display:flex;align-items:center;text-align:left;gap:12px;width:100%;border:1px solid transparent;padding:12px 10px}.navitem .ico{font-size:23px;width:28px;text-align:center}.navitem small{display:block;color:var(--muted);margin-top:3px;font-size:11px}.navitem.active{background:var(--blue2);border-color:#e0edff;color:var(--blue)}.navitem.active small{color:#5579ad}
+h2{font-size:16px;margin:0 0 14px}h3{font-size:13px;margin:0 0 10px}.muted{color:var(--muted)}.small{font-size:12px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.section-head h2{margin:0}.inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.template-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.template{padding:6px;text-align:center;font-size:11px}.template canvas{width:100%;aspect-ratio:1.5;display:block;background:#02060b;border-radius:5px;margin-bottom:5px;image-rendering:pixelated}
+.tip{background:#f4f9ff;border:1px solid #dceaff;border-radius:9px;padding:12px;color:#4c6791;font-size:12px;line-height:1.55}
+.workspace{display:flex;flex-direction:column;gap:12px;min-width:0}.editor-panel{padding:16px}.editor-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}.editor-toolbar h2{margin:0}.editor-area{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px}.tools{display:flex;flex-direction:column;gap:5px}.tool{padding:9px 3px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}.tool span{font-size:20px}.canvas-wrap{min-width:0;display:flex;align-items:center;justify-content:center;background:#f9fbff;border:1px solid #e5edf8;border-radius:9px;padding:10px;min-height:270px;overflow:hidden}.pixel-canvas{display:block;width:100%;max-height:460px;aspect-ratio:2/1;background:#02060b;image-rendering:pixelated;touch-action:none;cursor:crosshair;border-radius:3px}
+.bottom-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}.bottom-tools input[type=color]{width:32px;height:30px;border:0;padding:0;background:transparent}.bottom-tools input[type=range]{width:90px}.spacer{flex:1}
+.frames-panel{padding:16px}.frames-strip{display:flex;gap:9px;overflow-x:auto;padding:2px 0 5px}.frame-card{min-width:104px;width:104px;padding:7px;position:relative}.frame-card.selected{border-color:var(--blue);box-shadow:0 0 0 2px #d7e9ff}.frame-card canvas{width:100%;aspect-ratio:2/1;display:block;background:#02060b;border-radius:4px;image-rendering:pixelated}.frame-card span{display:block;text-align:center;font-size:11px;margin-top:6px}
+.preview-screen{background:#06090d;border:7px solid #303943;border-radius:10px;padding:8px;box-shadow:0 8px 18px #14274420}.preview-screen canvas{display:block;width:100%;aspect-ratio:2/1;image-rendering:pixelated}.preview-caption{text-align:center;color:var(--muted);font-size:11px;margin-top:8px}.field{display:flex;flex-direction:column;gap:5px;margin:12px 0}.field label{font-size:12px;color:#536b8f}.field input[type=text],.field input[type=number],.field select,.field input[type=file]{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;background:#fff;color:var(--ink);min-width:0}.field input[type=range]{width:100%}.checkrow{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12px;color:#536b8f}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.settings-grid .field{margin:0}.export-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.export-grid button{font-size:11px;padding:12px 5px;display:flex;flex-direction:column;gap:6px;align-items:center}.export-grid b{font-size:20px;color:var(--blue)}.full{width:100%}.status{font-size:12px;color:var(--muted);min-height:18px;margin-top:8px}.modal-backdrop{position:fixed;inset:0;background:#07162c80;display:none;align-items:center;justify-content:center;padding:16px;z-index:10}.modal{width:min(720px,100%);max-height:85vh;overflow:auto;background:#fff;border-radius:14px;padding:18px}.modal textarea{width:100%;height:48vh;border:1px solid var(--line);border-radius:8px;padding:12px;font:12px/1.5 ui-monospace,monospace}.footer{padding:18px;text-align:center;color:var(--muted);font-size:11px}
+@media(max-width:1100px){.app{grid-template-columns:220px minmax(350px,1fr)}.right{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.right .export-card{grid-column:1/-1}.topnav{display:none}}
+@media(max-width:720px){.topbar{padding:12px 14px;height:auto}.brand{min-width:0}.brand h1{font-size:17px}.topbar>.primary{font-size:12px}.app{display:flex;flex-direction:column;padding:9px}.left{order:1}.workspace{order:2}.right{order:3;display:flex}.toolnav{grid-template-columns:repeat(2,1fr)}.navitem{padding:9px 6px}.template-grid{grid-template-columns:repeat(3,1fr)}.editor-area{grid-template-columns:52px minmax(0,1fr);gap:7px}.editor-panel,.panel{padding:12px}.canvas-wrap{min-height:190px;padding:5px}.pixel-canvas{max-height:360px}.frames-panel .section-head{align-items:flex-start;flex-direction:column}.frame-card{min-width:90px;width:90px}.settings-grid{gap:8px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="logo">▦</div><div><h1><span style="color:#1677ff">OLED</span> Animation Maker</h1><p>Create · Animate · Export</p></div></div>
+  <nav class="topnav"><button>⌂ Home</button><button class="active">✎ Editor</button><button onclick="document.getElementById('templates').scrollIntoView({behavior:'smooth'})">▦ Templates</button></nav>
+  <button class="primary" id="topExport">〈/〉 Arduino Export</button>
+</header>
+<main class="app">
+  <aside class="left">
+    <section class="panel">
+      <div class="toolnav">
+        <button class="navitem active" data-jump="editor"><span class="ico">▦</span><span><strong>Pixel Editor</strong><small>Draw on your frames</small></span></button>
+        <button class="navitem" data-jump="templates"><span class="ico">☆</span><span><strong>Templates</strong><small>Start with a ready design</small></span></button>
+        <button class="navitem" id="gifNav"><span class="ico">▧</span><span><strong>GIF / Image Import</strong><small>Load a GIF or image</small></span></button>
+        <button class="navitem" data-jump="frames"><span class="ico">▷</span><span><strong>Animation</strong><small>Manage frames and speed</small></span></button>
+        <button class="navitem" data-jump="exportOptions"><span class="ico">⇩</span><span><strong>Export</strong><small>Save GIF, PNG or Arduino</small></span></button>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+      <div id="templates"><div class="section-head"><h3>Popular Templates</h3><button style="padding:4px 6px;border:0;color:var(--blue)" id="resetTemplates">Reset</button></div>
+      <div class="template-grid" id="templateGrid"></div></div>
+    </section>
+    <div class="tip">💡 <strong>Tip</strong><br>Draw on the pixel grid, add frames to animate, then export a GIF, PNG, or Arduino-compatible pixel array.</div>
+  </aside>
+  <section class="workspace" id="editor">
+    <section class="panel editor-panel">
+      <div class="editor-toolbar">
+        <h2>✎ Pixel Editor</h2>
+        <div class="inline"><label class="small muted">Photo fit</label><select id="photoFit"><option value="cover" selected>Crop to fill</option><option value="contain">Fit whole photo</option></select><label class="small muted">Canvas</label><select id="sizeSelect"><option value="128,64" selected>128 × 64</option><option value="64,32">64 × 32</option><option value="32,16">32 × 16</option></select><label class="small muted">Frame</label><span id="frameLabel" class="small">1 / 1</span><button id="clearBtn">Clear</button></div>
+      </div>
+      <div class="editor-area">
+        <div class="tools">
+          <button class="tool active" data-tool="pencil"><span>✎</span>Pencil</button>
+          <button class="tool" data-tool="eraser"><span>◇</span>Eraser</button>
+          <button class="tool" data-tool="fill"><span>▧</span>Fill</button>
+          <button class="tool" data-tool="line"><span>╱</span>Line</button>
+          <button class="tool" data-tool="rect"><span>□</span>Rectangle</button>
+          <button class="tool" data-tool="circle"><span>◯</span>Circle</button>
+          <button class="tool" data-tool="text"><span>T</span>Text</button>
+        </div>
+        <div class="canvas-wrap"><canvas id="pixelCanvas" class="pixel-canvas" width="128" height="64" aria-label="Pixel drawing canvas"></canvas></div>
+      </div>
+      <div class="bottom-tools">
+        <label class="small muted">Pixel colour</label><input id="colorPick" type="color" value="#79d9ff"><button id="blackBtn" title="Black">Black</button><button id="whiteBtn" title="White">White</button>
+        <span class="spacer"></span><label class="small muted">Zoom</label><button id="zoomOut">−</button><input id="zoom" type="range" min="1" max="4" value="1"><button id="zoomIn">+</button>
+      </div>
+      <div class="status" id="status" role="status">Ready. Select a tool and draw on the grid.</div>
+    </section>
+    <section class="panel frames-panel" id="frames">
+      <div class="section-head"><h2>Frames</h2><div class="inline"><button id="addFrame">＋ Add Frame</button><button id="duplicateFrame">▣ Duplicate</button><button id="deleteFrame">⌫ Delete</button><button id="playBtn" class="primary">▶ Play</button></div></div>
+      <div class="frames-strip" id="framesStrip"></div>
+    </section>
+  </section>
+  <aside class="right">
+    <section class="panel">
+      <h2>Live Preview <span class="muted small">(OLED simulation)</span></h2>
+      <div class="preview-screen"><canvas id="previewCanvas" width="128" height="64"></canvas></div>
+      <div class="preview-caption" id="previewCaption">128 × 64 pixels · 5 FPS</div>
+      <div class="field"><label for="speed">Animation Speed <span id="speedLabel" style="float:right">5 FPS</span></label><input id="speed" type="range" min="1" max="20" value="5"></div>
+      <div class="checkrow"><label for="loopToggle">Loop animation</label><input id="loopToggle" type="checkbox" checked></div>
+    </section>
+    <section class="panel">
+      <h2>Animation Settings</h2>
+      <div class="settings-grid">
+        <div class="field"><label for="frameCount">Frame count</label><input id="frameCount" type="number" min="1" max="120" value="1" readonly></div>
+        <div class="field"><label for="loopCount">Loop count</label><select id="loopCount"><option value="0">Infinite</option><option value="1">1 time</option><option value="3">3 times</option><option value="5">5 times</option></select></div>
+      </div>
+      <div class="field"><label for="direction">Playback direction</label><select id="direction"><option value="forward">Forward</option><option value="reverse">Reverse</option><option value="pingpong">Ping-pong</option></select></div>
+    </section>
+    <section class="export-card" id="exportOptions">
+      <button class="primary full" id="exportPng" style="font-size:15px;padding:13px">⇩ Export Current Frame (PNG)</button>
+    </section>
+    <section class="panel">
+      <h2>Export Options</h2>
+      <div class="export-grid">
+        <button id="exportGif"><b>▧</b>GIF <span class="muted">Animated</span></button>
+        <button id="exportSheet"><b>▣</b>Sprite sheet <span class="muted">PNG frames</span></button>
+        <button id="exportCode"><b>〈/〉</b>Arduino <span class="muted">C++ array</span></button>
+      </div>
+      <div class="status" id="exportStatus">Exports are generated in your browser.</div>
+    </section>
+  </aside>
+</main>
+<footer class="footer">OLED Animation Maker · Prepared by Nishanth, ECE Student · Runs locally in your browser</footer>
+<div class="modal-backdrop" id="codeModal"><div class="modal">
+<div class="section-head"><h2>Board Setup & Code Export</h2><button id="closeModal">✕ Close</button></div>
+<p class="muted small">Choose your microcontroller. The generated sketch uses an SSD1306 I²C OLED (usually address 0x3C). Check your board and OLED module before wiring.</p>
+<div class="settings-grid">
+<div class="field"><label for="boardSelect">Microcontroller board</label><select id="boardSelect"><option value="uno">Arduino Uno</option><option value="nano">Arduino Nano (classic)</option><option value="esp32">ESP32 DevKit</option><option value="esp8266">ESP8266 NodeMCU</option><option value="pico">Raspberry Pi Pico (Arduino core)</option></select></div>
+<div class="field"><label for="oledAddress">OLED I²C address</label><select id="oledAddress"><option value="0x3C">0x3C (common)</option><option value="0x3D">0x3D</option></select></div>
+</div>
+<div class="panel" style="padding:12px;margin:10px 0;background:#f5f9ff"><h3>Wire connections</h3><div id="wiringInfo" class="small"></div><p class="small muted" style="margin-bottom:0">Connect GND to GND and VCC to the voltage supported by your OLED module. Do not assume every module is 5V tolerant.</p></div>
+<div class="inline" style="margin:8px 0"><button id="refreshCode" class="primary">Generate board code</button></div>
+<textarea id="codeOutput" spellcheck="false"></textarea><div class="inline" style="margin-top:10px"><button class="primary" id="downloadCode">Download .ino sketch</button><button id="copyCode">Copy code</button></div>
+<p class="small muted">Install the “Adafruit SSD1306” and “Adafruit GFX Library” libraries in Arduino IDE. Board pin labels can vary by model.</p>
+</div></div>
+<input type="file" id="fileInput" accept="image/*,.gif" hidden>
+<script>
+// Website prepared by Nishanth, ECE Student.
+(() => {
+const $ = id => document.getElementById(id);
+const canvas = $('pixelCanvas'), ctx = canvas.getContext('2d');
+const preview = $('previewCanvas'), pctx = preview.getContext('2d');
+let W=128,H=64, frames=[new Uint8Array(128*64)], active=0, tool='pencil', color=1, drawing=false, startPoint=null, beforeShape=null, playing=false, playTimer=null, playIndex=0, zoom=1;
+const templateNames=['Heart','Smile','Battery','Clock','Rocket','Game Over'];
+const templates = [
+ (w,h)=>{let a=new Uint8Array(w*h); const cx=Math.floor(w/2),cy=Math.floor(h/2); for(let y=-Math.floor(h*.2);y<=Math.floor(h*.2);y++)for(let x=-Math.floor(w*.25);x<=Math.floor(w*.25);x++){let xx=x/(w*.25), yy=y/(h*.2);if((xx*xx+yy*yy-1)**3-xx*xx*yy*yy*yy<=0) put(a,w,h,cx+x,cy+y); }return a},
+ (w,h)=>{let a=new Uint8Array(w*h),cx=w>>1,cy=h>>1,r=Math.min(w,h)*.28; circle(a,w,h,cx,cy,r,1,false); put(a,w,h,cx-r*.35,cy-r*.2);put(a,w,h,cx+r*.35,cy-r*.2); for(let x=-r*.35;x<=r*.36;x++)if(Math.abs(x)>r*.1)put(a,w,h,cx+x,cy+r*.2+Math.abs(x)*.4);return a},
+ (w,h)=>{let a=new Uint8Array(w*h),x=w*.25,y=h*.32,bw=w*.5,bh=h*.36;rect(a,w,h,x,y,bw,bh,1,false);rect(a,w,h,x+bw,y+bh*.3,w*.06,bh*.4,1,true);for(let i=0;i<3;i++)rect(a,w,h,x+bw*.12+i*bw*.24,y+bh*.2,bw*.15,bh*.6,1,true);return a},
+ (w,h)=>{let a=new Uint8Array(w*h),cx=w/2,cy=h/2,r=Math.min(w,h)*.3;circle(a,w,h,cx,cy,r,1,false);line(a,w,h,cx,cy,cx,cy-r*.65,1);line(a,w,h,cx,cy,cx+r*.5,cy+r*.15,1);return a},
+ (w,h)=>{let a=new Uint8Array(w*h);line(a,w,h,w*.25,h*.72,w*.7,h*.25,1);line(a,w,h,w*.7,h*.25,w*.75,h*.58,1);line(a,w,h,w*.75,h*.58,w*.25,h*.72,1);line(a,w,h,w*.38,h*.6,w*.25,h*.86,1);line(a,w,h,w*.57,h*.42,w*.7,h*.75,1);circle(a,w,h,w*.52,h*.48,Math.max(2,w*.045),1,true);return a},
+ (w,h)=>{let a=new Uint8Array(w*h);pixelText(a,w,h,'GAME',w*.18,h*.25,Math.max(1,Math.floor(w/32)));pixelText(a,w,h,'OVER',w*.18,h*.58,Math.max(1,Math.floor(w/32)));return a}
+];
+function put(a,w,h,x,y,v=1){x=Math.round(x);y=Math.round(y);if(x>=0&&x<w&&y>=0&&y<h)a[y*w+x]=v}
+function line(a,w,h,x0,y0,x1,y1,v=1){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);let dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1,err=dx+dy;while(true){put(a,w,h,x0,y0,v);if(x0===x1&&y0===y1)break;let e=2*err;if(e>=dy){err+=dy;x0+=sx}if(e<=dx){err+=dx;y0+=sy}}}
+function rect(a,w,h,x,y,bw,bh,v=1,fill=false){x=Math.round(x);y=Math.round(y);bw=Math.round(bw);bh=Math.round(bh);for(let yy=Math.min(y,y+bh);yy<=Math.max(y,y+bh);yy++)for(let xx=Math.min(x,x+bw);xx<=Math.max(x,x+bw);xx++)if(fill||xx===x||xx===x+bw||yy===y||yy===y+bh)put(a,w,h,xx,yy,v)}
+function circle(a,w,h,cx,cy,r,v=1,fill=false){cx=Math.round(cx);cy=Math.round(cy);r=Math.max(1,Math.round(r));for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){let d=x*x+y*y;if(fill?d<=r*r:Math.abs(d-r*r)<=r*1.6)put(a,w,h,cx+x,cy+y,v)}}
+const glyphs={'A':[14,17,17,31,17,17,17],'E':[31,16,16,30,16,16,31],'G':[14,17,16,23,17,17,15],'M':[17,27,21,21,17,17,17],'O':[14,17,17,17,17,17,14],'V':[17,17,17,17,17,10,4],'R':[30,17,17,30,20,18,17],' ': [0,0,0,0,0,0,0]};
+function pixelText(a,w,h,str,x,y,s=1){let ox=Math.round(x);for(const ch of str.toUpperCase()){let g=glyphs[ch]||glyphs['O'];for(let yy=0;yy<7;yy++)for(let xx=0;xx<5;xx++)if(g[yy]&(1<<(4-xx)))for(let sy=0;sy<s;sy++)for(let sx=0;sx<s;sx++)put(a,w,h,ox+xx*s+sx,Math.round(y)+yy*s+sy);ox+=6*s}}
+function current(){return frames[active]}
+function renderCanvas(target,a,w,h,grid=false){const c=target.getContext('2d');c.clearRect(0,0,target.width,target.height);c.fillStyle='#02060b';c.fillRect(0,0,target.width,target.height);const cw=target.width/w,ch=target.height/h;const isPreview=target===preview;c.fillStyle=isPreview?'#79d9ff':$('colorPick').value;if(isPreview){c.shadowColor='#25aaff';c.shadowBlur= Math.max(2,cw*.8)}for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(a[y*w+x])c.fillRect(x*cw,y*ch,Math.ceil(cw),Math.ceil(ch));c.shadowBlur=0;if(grid&&cw>=3){c.strokeStyle='#263749';c.lineWidth=.5;for(let x=0;x<=w;x++){c.beginPath();c.moveTo(x*cw,0);c.lineTo(x*cw,target.height);c.stroke()}for(let y=0;y<=h;y++){c.beginPath();c.moveTo(0,y*ch);c.lineTo(target.width,y*ch);c.stroke()}}}
+function redraw(){renderCanvas(canvas,current(),W,H,true);renderCanvas(preview,frames[playing?playIndex:active],W,H,false);$('frameLabel').textContent=`${active+1} / ${frames.length}`;$('frameCount').value=frames.length;$('previewCaption').textContent=`${W} × ${H} pixels · ${$('speed').value} FPS`;drawStrip()}
+function drawStrip(){const strip=$('framesStrip');strip.innerHTML='';frames.forEach((a,i)=>{let b=document.createElement('button');b.className='frame-card'+(i===active?' selected':'');let c=document.createElement('canvas');c.width=W;c.height=H;renderCanvas(c,a,W,H,false);let label=document.createElement('span');label.textContent=`Frame ${i+1}`;b.append(c,label);b.onclick=()=>{active=i;redraw()};strip.append(b)})}
+function point(e){const r=canvas.getBoundingClientRect();return {x:Math.max(0,Math.min(W-1,Math.floor((e.clientX-r.left)/r.width*W))),y:Math.max(0,Math.min(H-1,Math.floor((e.clientY-r.top)/r.height*H)))}}
+function paintAt(p,v=color){put(current(),W,H,p.x,p.y,v)}
+function flood(a,x,y,oldv,newv){if(oldv===newv)return;let stack=[[x,y]];while(stack.length){let [px,py]=stack.pop();if(px<0||py<0||px>=W||py>=H||a[py*W+px]!==oldv)continue;a[py*W+px]=newv;stack.push([px+1,py],[px-1,py],[px,py+1],[px,py-1])}}
+function drawShape(a,p1,p2){if(tool==='line')line(a,W,H,p1.x,p1.y,p2.x,p2.y,color);if(tool==='rect')rect(a,W,H,p1.x,p1.y,p2.x-p1.x,p2.y-p1.y,color,false);if(tool==='circle')circle(a,W,H,p1.x,p1.y,Math.hypot(p2.x-p1.x,p2.y-p1.y),color,false)}
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();canvas.setPointerCapture(e.pointerId);drawing=true;const p=point(e);startPoint=p;beforeShape=current().slice();if(tool==='pencil'||tool==='eraser'){paintAt(p,tool==='eraser'?0:color)}else if(tool==='fill'){flood(current(),p.x,p.y,current()[p.y*W+p.x],color);drawing=false}else if(tool==='text'){const t=prompt('Text to draw (simple pixel font):','HI');if(t)pixelText(current(),W,H,t,p.x,p.y,Math.max(1,Math.floor(W/64)));drawing=false}redraw()});
+canvas.addEventListener('pointermove',e=>{if(!drawing)return;const p=point(e);if(tool==='pencil'||tool==='eraser'){line(current(),W,H,startPoint.x,startPoint.y,p.x,p.y,tool==='eraser'?0:color);startPoint=p}else if(['line','rect','circle'].includes(tool)){current().set(beforeShape);drawShape(current(),startPoint,p)}redraw()});
+function stopDraw(){if(drawing){drawing=false;redraw()}}canvas.addEventListener('pointerup',stopDraw);canvas.addEventListener('pointercancel',stopDraw);
+document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));$('status').textContent=`${tool[0].toUpperCase()+tool.slice(1)} tool selected.`});
+$('colorPick').oninput=()=>redraw();$('blackBtn').onclick=()=>{color=0;$('colorPick').value='#000000';$('status').textContent='Black pixels selected.'};$('whiteBtn').onclick=()=>{color=1;$('colorPick').value='#ffffff';$('status').textContent='White pixels selected.'};
+$('clearBtn').onclick=()=>{current().fill(0);redraw();$('status').textContent='Current frame cleared.'};
+$('addFrame').onclick=()=>{if(frames.length>=120)return alert('Maximum 120 frames');frames.splice(active+1,0,current().slice());active++;redraw()};
+$('duplicateFrame').onclick=()=>{if(frames.length>=120)return alert('Maximum 120 frames');frames.splice(active+1,0,current().slice());active++;redraw()};
+$('deleteFrame').onclick=()=>{if(frames.length===1){current().fill(0)}else{frames.splice(active,1);active=Math.max(0,active-1)}redraw()};
+$('sizeSelect').onchange=()=>{const [nw,nh]=$('sizeSelect').value.split(',').map(Number);W=nw;H=nh;frames=frames.map(old=>{let a=new Uint8Array(W*H);for(let y=0;y<Math.min(H,Math.round(Math.sqrt(old.length*H/W)));y++){}return a});canvas.width=W;canvas.height=H;preview.width=W;preview.height=H;active=0;redraw();$('status').textContent='Canvas resized and cleared. Choose a template to start again.'};
+$('speed').oninput=()=>{ $('speedLabel').textContent=$('speed').value+' FPS';$('previewCaption').textContent=`${W} × ${H} pixels · ${$('speed').value} FPS`;if(playing)startPlayback() };
+$('zoom').oninput=()=>{zoom=Number($('zoom').value);canvas.style.imageRendering='pixelated';$('status').textContent=`Pixel grid zoom ${zoom}× (visual grid remains fitted to the editor).`};$('zoomIn').onclick=()=>{$('zoom').value=Math.min(4,Number($('zoom').value)+1);$('zoom').dispatchEvent(new Event('input'))};$('zoomOut').onclick=()=>{$('zoom').value=Math.max(1,Number($('zoom').value)-1);$('zoom').dispatchEvent(new Event('input'))};
+function stopPlayback(){playing=false;if(playTimer)clearInterval(playTimer);playTimer=null;$('playBtn').textContent='▶ Play';redraw()}
+function startPlayback(){if(playTimer)clearInterval(playTimer);playing=true;$('playBtn').textContent='Ⅱ Pause';let dir=1;let loops=0;playTimer=setInterval(()=>{let mode=$('direction').value;if(mode==='reverse'){playIndex=(playIndex-1+frames.length)%frames.length}else if(mode==='pingpong'){playIndex+=dir;if(playIndex>=frames.length-1||playIndex<=0)dir*=-1}else{playIndex++;if(playIndex>=frames.length){playIndex=0;loops++;if(!$('loopToggle').checked||(Number($('loopCount').value)>0&&loops>=Number($('loopCount').value))){stopPlayback();return}}}renderCanvas(preview,frames[playIndex],W,H,false)},1000/Number($('speed').value))}
+$('playBtn').onclick=()=>playing?stopPlayback():startPlayback();
+function loadTemplate(i){stopPlayback();frames=[templates[i](W,H)];active=0;redraw();$('status').textContent=`${templateNames[i]} template loaded. Add frames to animate it.`}
+function buildTemplates(){const grid=$('templateGrid');grid.innerHTML='';templateNames.forEach((name,i)=>{let b=document.createElement('button');b.className='template';let c=document.createElement('canvas');c.width=W;c.height=H;renderCanvas(c,templates[i](W,H),W,H,false);let t=document.createElement('span');t.textContent=name;b.append(c,t);b.onclick=()=>loadTemplate(i);grid.append(b)})}
+$('resetTemplates').onclick=()=>buildTemplates();document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump).scrollIntoView({behavior:'smooth'}));
+$('gifNav').onclick=()=>$('fileInput').click();
+function importPhotoToPixels(bitmap){
+ const temp=document.createElement('canvas');temp.width=W;temp.height=H;const tc=temp.getContext('2d',{willReadFrequently:true});
+ tc.fillStyle='#000';tc.fillRect(0,0,W,H);
+ const fit=$('photoFit')?.value||'cover', scale=fit==='cover'?Math.max(W/bitmap.width,H/bitmap.height):Math.min(W/bitmap.width,H/bitmap.height);
+ const dw=bitmap.width*scale,dh=bitmap.height*scale,dx=(W-dw)/2,dy=(H-dh)/2;
+ tc.imageSmoothingEnabled=true;tc.imageSmoothingQuality='high';tc.drawImage(bitmap,dx,dy,dw,dh);
+ const image=tc.getImageData(0,0,W,H),data=image.data,gray=new Float32Array(W*H),out=new Uint8Array(W*H);
+ // Boost local contrast a little, then use Floyd-Steinberg dithering to preserve face and fabric detail.
+ for(let i=0;i<gray.length;i++){const k=i*4;let lum=(data[k]*.299+data[k+1]*.587+data[k+2]*.114);gray[i]=Math.max(0,Math.min(255,(lum-128)*1.28+128));if(data[k+3]<20)gray[i]=0}
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){let i=y*W+x,old=gray[i],v=old>=124?255:0;out[i]=v?1:0;let err=old-v;if(x+1<W)gray[i+1]+=err*7/16;if(x>0&&y+1<H)gray[i+W-1]+=err*3/16;if(y+1<H)gray[i+W]+=err*5/16;if(x+1<W&&y+1<H)gray[i+W+1]+=err/16}
+ return out;
+}
+$('fileInput').onchange=async e=>{let file=e.target.files[0];if(!file)return;try{const bitmap=await createImageBitmap(file);const a=importPhotoToPixels(bitmap);frames=[a];active=0;redraw();$('status').textContent='Photo converted with detail-preserving dithering. For portraits, try Fit whole photo if the crop cuts off important details. OLED preview uses light-blue pixels.'}catch(err){alert('Could not read that file. Try a PNG, JPG or GIF image.')}e.target.value=''};
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+$('exportPng').onclick=()=>{canvas.toBlob(blob=>downloadBlob(blob,'oled-frame.png'))};
+$('exportSheet').onclick=()=>{const cols=Math.ceil(Math.sqrt(frames.length)),rows=Math.ceil(frames.length/cols),c=document.createElement('canvas');c.width=cols*W;c.height=rows*H;const x=c.getContext('2d');frames.forEach((a,i)=>{const tile=document.createElement('canvas');tile.width=W;tile.height=H;renderCanvas(tile,a,W,H,false);x.drawImage(tile,(i%cols)*W,Math.floor(i/cols)*H)});c.toBlob(blob=>downloadBlob(blob,'oled-sprite-sheet.png'));$('exportStatus').textContent='Sprite sheet exported.'};
+const boardInfo = {
+ uno: {name:"Arduino Uno",sda:"A4 (SDA)",scl:"A5 (SCL)",include:"",setup:"Wire.begin();"},
+ nano:{name:"Arduino Nano (classic)",sda:"A4 (SDA)",scl:"A5 (SCL)",include:"",setup:"Wire.begin();"},
+ esp32:{name:"ESP32 DevKit",sda:"GPIO 21 (SDA)",scl:"GPIO 22 (SCL)",include:"",setup:"Wire.begin(21, 22);"},
+ esp8266:{name:"ESP8266 NodeMCU",sda:"D2 / GPIO4 (SDA)",scl:"D1 / GPIO5 (SCL)",include:"",setup:"Wire.begin(D2, D1);"},
+ pico:{name:"Raspberry Pi Pico (Arduino core)",sda:"GP4 (SDA)",scl:"GP5 (SCL)",include:"",setup:"Wire.setSDA(4); Wire.setSCL(5); Wire.begin();"}
+};
+function wiringText(){
+ const b=boardInfo[$('boardSelect').value];
+ $('wiringInfo').innerHTML=`<b>${b.name}</b><br>OLED GND → Board GND<br>OLED VCC → board/module-supported supply<br>OLED SDA → ${b.sda}<br>OLED SCL → ${b.scl}<br><br><span class="muted">OLED type assumed: SSD1306 I²C, ${W}×${H} pixels.</span>`;
+}
+function makeArduino(){
+ const b=boardInfo[$('boardSelect').value], addr=$('oledAddress').value;
+ let out=`// OLED Animation Maker - generated sketch
+// Prepared by Nishanth, ECE Student
+// Board: ${b.name}
+// OLED: SSD1306 I2C ${W}x${H}, address ${addr}
+// Wiring: SDA -> ${b.sda}; SCL -> ${b.scl}; GND -> GND; VCC -> module-supported supply
+// Install libraries: Adafruit SSD1306 and Adafruit GFX Library
+
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH ${W}
+#define SCREEN_HEIGHT ${H}
+#define OLED_ADDR ${addr}
+#define FRAME_COUNT ${frames.length}
+#define FRAME_DELAY_MS ${Math.round(1000/Number($('speed').value))}
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+// Each frame is a packed 1-bit bitmap. White pixels are lit.
+const uint8_t oledFrames[FRAME_COUNT][(SCREEN_WIDTH * SCREEN_HEIGHT) / 8] PROGMEM = {
+`;
+ frames.forEach((a,fi)=>{
+  let bytes=[];
+  for(let i=0;i<a.length;i+=8){
+   let v=0;
+   for(let bit=0;bit<8&&i+bit<a.length;bit++) if(a[i+bit]) v|=(1<<(7-bit));
+   bytes.push('0x'+v.toString(16).padStart(2,'0'));
+  }
+  out+='  { '+bytes.join(', ')+' }'+(fi<frames.length-1?',':'')+'\\n';
+ });
+ out+=`};
+
+void setup() {
+  Serial.begin(115200);
+  ${b.setup}
+  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
+    Serial.println(F("SSD1306 allocation/init failed. Check wiring and I2C address."));
+    while (true) { delay(100); }
+  }
+  display.clearDisplay();
+  display.display();
+}
+
+void loop() {
+  static uint8_t frame = 0;
+  display.clearDisplay();
+  display.drawBitmap(0, 0, oledFrames[frame], SCREEN_WIDTH, SCREEN_HEIGHT, SSD1306_WHITE);
+  display.display();
+  frame = (frame + 1) % FRAME_COUNT;
+  delay(FRAME_DELAY_MS);
+}
+`;
+ return out;
+}
+function openCode(){ wiringText(); $('codeOutput').value=makeArduino();$('codeModal').style.display='flex' }
+$('exportCode').onclick=openCode;$('topExport').onclick=openCode;$('closeModal').onclick=()=>$('codeModal').style.display='none';$('codeModal').onclick=e=>{if(e.target===$('codeModal'))$('codeModal').style.display='none'};$('downloadCode').onclick=()=>downloadBlob(new Blob([makeArduino()],{type:'text/plain'}),'oled_animation.ino');$('boardSelect').onchange=()=>{wiringText();$('codeOutput').value=makeArduino()};$('oledAddress').onchange=()=>{$('codeOutput').value=makeArduino()};$('refreshCode').onclick=()=>{$('codeOutput').value=makeArduino();wiringText()};
+$('copyCode').onclick=async()=>{try{await navigator.clipboard.writeText($('codeOutput').value);$('copyCode').textContent='Copied!'}catch(e){$('codeOutput').select();document.execCommand('copy');$('copyCode').textContent='Copied!'}};
+$('exportGif').onclick=()=>{ $('exportStatus').textContent='GIF export needs an encoder library. For now, use Sprite sheet PNG or Arduino C++ export; animated GIF export will be added in the next version.';alert('Animated GIF export is not enabled in this first version. Sprite sheet PNG and Arduino C++ export work now.') };
+buildTemplates();loadTemplate(1);
+})();
+</script>
+</body>
+</html>
